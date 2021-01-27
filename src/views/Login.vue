@@ -70,8 +70,8 @@ export default {
       isShow: false,
       // 登录单数据
       loginForm: {
-        username: 'admin',
-        password: '123456'
+        username: 'qym',
+        password: 'admin123'
       },
       // 表单验证规则
       rules: {
@@ -108,12 +108,15 @@ export default {
       this.$refs.loginFormRef.validate(async flag => {
         if (!flag) return console.log('failed')
         const { data: res } = await this.$axios.post('login', this.loginForm)
-        if (res.meta.status !== 200) {
-          this.$message.error(res.meta.msg)
+        // const { data: res } = await this.$axios.get('login', {
+        //   params: this.loginForm
+        // })
+        if (res.status !== 0) {
+          this.$message.error(res.message)
         } else {
           this.$message.success('登录成功')
-          sessionStorage.setItem('token', res.data.token)
-          this.$router.push('/home')
+          sessionStorage.setItem('token', res.token)
+          this.$router.push('/index')
         }
       })
     }
