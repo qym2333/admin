@@ -8,7 +8,7 @@
         <p class="name">胖达</p>
       </div>
       <el-menu :default-active="activeIndex" mode="horizontal" router :collapse="isCollapse" :collapse-transition="false">
-        <el-menu-item :index="item.path" v-for="(item,index) in menuList" :key="index">
+        <el-menu-item :index="item.path" v-for="(item,index) in menuList" :key="index" @click="toPage(item.title)">
           <i :class="item.icon"></i>
           <span>{{item.title}}</span>
           <span v-if="item.title=='Comment'" class="unread">99</span>
@@ -80,7 +80,21 @@ export default {
   },
 
   methods: {
-
+    // 点击每个导航
+    toPage (data) {
+      this.isShow = false
+      // 账号退出，清除token 回到登录页
+      if (data === 'Leave') {
+        this.$confirm('是否退出登录?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          sessionStorage.removeItem('token')
+          this.$router.push('/login')
+        })
+      }
+    }
   }
 }
 </script>

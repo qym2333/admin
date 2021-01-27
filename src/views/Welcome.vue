@@ -5,7 +5,21 @@
       <span>{{time.year || '请珍惜时间'}}</span>
       <span>{{time.date || '一寸光阴一寸金'}}</span>
     </p>
-    <section></section>
+    <section class="info">
+      <i class="title-icon el-icon-lollipop"></i>
+      <h4>Hello，你好，我是谁！</h4>
+      <div>
+        <p>重新认识、审视、定义一下自己吧。</p>
+        <ul>
+          <li><span class="el-icon-lollipop"></span>现在的你，是个怎样的人？</li>
+          <li><span class="el-icon-lollipop"></span>你希望以后成为怎样的人？</li>
+          <li><span class="el-icon-lollipop"></span>你心中的未来是怎样的？</li>
+          <li><span class="el-icon-lollipop"></span>最想做的一件事是什么？</li>
+          <li><span class="el-icon-lollipop"></span>你现在的生活，开心吗？</li>
+          <li><span class="el-icon-hot-water"></span>心如止水，淡中得味，加油。</li>
+        </ul>
+      </div>
+    </section>
     <section></section>
     <section></section>
     <section></section>
@@ -185,29 +199,28 @@ export default {
       }
     }
     &.info {
+      .title-icon {
+        font-style: normal;
+        font-weight: 400;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        vertical-align: baseline;
+        display: inline-block;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        position: absolute;
+        left: 14px;
+        top: 10px;
+        font-size: 30px;
+        color: #7fc3ff;
+      }
       h4 {
         font-size: 16px;
         font-weight: 400;
         margin: 22px 0 10px;
         color: #0e8bff;
         padding-left: 15px;
-        &::after {
-          content: '\e6a4';
-          font-style: normal;
-          font-weight: 400;
-          font-variant: normal;
-          text-transform: none;
-          line-height: 1;
-          vertical-align: baseline;
-          display: inline-block;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-          position: absolute;
-          left: 14px;
-          top: 10px;
-          font-size: 30px;
-          color: #7fc3ff;
-        }
       }
       p {
         font-size: 13px;
