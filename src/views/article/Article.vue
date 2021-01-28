@@ -1,7 +1,7 @@
 <template>
   <div class="article">
-    <h2 class="tit">文章列表 ({{total}}) <router-link to="/article/create">雅俗共赏</router-link>
-    </h2>
+
+    <h2 class="tit">文章列表 ({{total}}) <i class="el-icon-lollipop" @click="$router.push('/article/info')"> 雅俗共赏</i></h2>
     <el-table :data="articleList">
       <el-table-column prop="title" label="Title">
       </el-table-column>
@@ -17,10 +17,10 @@
             <i class="el-icon-view" @click="view(scope.row.id)"></i>
           </el-tooltip>
           <el-tooltip effect="dark" content="Edit Article" placement="top">
-            <i class="el-icon-edit" @click="edit(scope.row.id)"></i>
+            <i class="el-icon-edit" @click="handleEdit(scope.row.id)"></i>
           </el-tooltip>
           <el-tooltip effect="dark" content="Delete" placement="top">
-            <i class="el-icon-delete" @click="remove(scope.row)"></i>
+            <i class="el-icon-delete" @click="handleDelete(scope.row.id)"></i>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -40,7 +40,7 @@ export default {
       articleList: [], // 文章列表
       queryData: {
         page: 1, // 页码
-        count: 8 // 每页数量
+        count: 7 // 每页数量
       }
     }
   },
@@ -61,11 +61,36 @@ export default {
       if (res.status !== 0) return this.$message.error(res.message)
       this.articleList = res.data.data
       this.total = res.data.total
-      console.log(res)
     },
     handleChangePage (val) {
       this.queryData.page = val
       this.getArticleList()
+    },
+    handleEdit (id) {
+      this.$router.push({
+        name: 'articleInfo',
+        query: { id: id }
+      })
+    },
+    handleDelete (id) {
+      console.log(id)
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const { data: res } = await this.$axios.delete(`article/${id}`)
+        this.$message({
+          type: 'success',
+          message: res.message
+        })
+        this.getArticleList()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
   }
 }

@@ -4,7 +4,7 @@ import Login from '../views/Login.vue'
 import Index from '../views/Index.vue'
 import Welcome from '../views/Welcome.vue'
 import Article from '../views/article/Article.vue'
-import CreateArticle from '../views/article/Create.vue'
+import ArticleInfo from '../views/article/Info.vue'
 
 Vue.use(VueRouter)
 
@@ -25,8 +25,9 @@ const routes = [{
     path: '/article',
     component: Article
   }, {
-    path: '/article/create',
-    component: CreateArticle
+    name: 'articleInfo',
+    path: '/article/info',
+    component: ArticleInfo
   }]
 }]
 
