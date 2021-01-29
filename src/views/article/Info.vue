@@ -12,11 +12,11 @@
       <el-input placeholder="文章摘要" prefix-icon="el-icon-document" clearable v-model="info.describe">
       </el-input>
 
-      <!-- <div class="upload-box" v-if="!uploadToggle">
+      <div class="upload-box" v-if="!uploadToggle">
         <el-upload class="upload-demo" :auto-upload="false" :show-file-list="false" :on-change="musicUpload" action="" drag>
-          <template v-if="data.music && data.music.url">
+          <template v-if="info.music && info.music.url">
             <i class="el-icon-headset"></i>
-            <div class="el-upload__text">{{data['music'].name}}</div>
+            <div class="el-upload__text">{{info['music'].name}}</div>
           </template>
           <template v-else>
             <i class="el-icon-headset"></i>
@@ -24,7 +24,7 @@
           </template>
         </el-upload>
         <el-upload class="upload-demo" :auto-upload="false" :show-file-list="false" :on-change="imgUpload" action="" drag>
-          <img v-if="data.image && data.image.url" :src="data.image.url">
+          <img v-if="info.image && info.image.url" :src="info.image.url">
           <i class="el-icon-picture-outline-round"></i>
           <div class="el-upload__text">封面图片 (680*440)</div>
         </el-upload>
@@ -34,7 +34,7 @@
         </el-input>
         <el-input placeholder="封面图片" prefix-icon="el-icon-picture-outline-round" clearable>
         </el-input>
-      </template>-->
+      </template>
 
       <el-switch active-text="输入链接" inactive-text="文件上传">
       </el-switch>
@@ -52,6 +52,7 @@ export default {
     return {
       id: null,
       activeEditor: null,
+      // md配置
       setting: {
         menubar: false,
         toolbar: 'undo redo | wordcount | fullscreen | formatselect alignleft aligncenter alignright alignjustify | link unlink | numlist bullist | image table | fontselect fontsizeselect forecolor backcolor | bold italic underline strikethrough | indent outdent | superscript subscript | removeformat |',
@@ -61,8 +62,9 @@ export default {
         language: 'zh_CN', // 本地化设置
         height: 350,
         branding: false,
-        images_upload_url: '/demo',
-        images_upload_base_path: '/demo'
+        images_upload_handler: this.images_upload_handler
+        // images_upload_url: 'http://127.0.0.1:3000/admin/api/upload'
+        // images_upload_base_path: '/demo'
       },
       // 文章内容
       info: {
@@ -75,10 +77,28 @@ export default {
         music: {}, // 音乐
         words: 0,
         hide: false // 隐藏
-      }
+      },
+      upload: {}, // 上传文件
+      uploadToggle: false // 上传开关
     }
   },
 
+  watch: {
+    'info.image.url': {
+      handler (val) {
+        if (!val) {
+          delete this.upload.image
+        }
+      }
+    },
+    'info.music.url': {
+      handler (val) {
+        if (!val) {
+          delete this.upload.music
+        }
+      }
+    }
+  },
   created () {
     this.id = this.$route.query.id
     if (this.id) this.renderData(this.id)
@@ -87,37 +107,73 @@ export default {
     this.activeEditor = this.$tinymce.activeEditor // 当前富文本编辑器
   },
   methods: {
+    musicUpload (file) {
+      this.uploads('music', file)
+    },
+    imgUpload (file) {
+      this.uploads('image', file)
+    },
     // 获取富文本编辑器内容
     getBody () {
       const editBody = this.activeEditor.getBody()
       this.activeEditor.selection.select(editBody)
-      const text = this.activeEditor.selection.getContent({ format: 'text' }).replace(/\n/g, ' ') // 获取纯文本
+      let text = this.activeEditor.selection.getContent({ format: 'text' }).replace(/\n/g, ' ')// 获取纯文本
+      text = text.replace(/[\\s]+/g, ' ')
       this.info.content = text // 文章纯文本内容
       this.info.words = text.length // 统计字数（包含空格）
-      console.log(text)
     },
     async renderData (id) {
       const { data: res } = await this.$axios.get(`article/${id}`)
       this.info = res.data[0]
     },
+    // 发布文章
     async handleSubmit () {
       this.getBody()
       let promise = null
       if (this.id) {
         promise = await this.$axios.put(`article/${this.id}`, this.info)
       } else {
+        // 摘要默认内容，摘要为空时使用文本
+        const describe = this.info.describe
+        this.info.describe = !describe ? this.info.content.slice(0, 60) + '...' : describe
         promise = await this.$axios.post('article', this.info)
       }
       const { data: res } = promise
       if (res.status !== 0) return this.$message.error(res.message)
       this.$message.success(res.message)
       this.$router.push('/article')
+    },
+    images_upload_handler (blobInfo, success, failure, progress) {
+      // tinymce api文档查阅可知   直接获取blob原始数据
+      var blob = blobInfo.blob()
+      // 原生上传
+      var fd = new FormData()
+      fd.append('file', blob)
+      // console.log(_this.uploadUrl, fd);
+      // 上传到 通用上传接口   oss里
+      this.$axios
+        .post('/upload', fd)
+        .then(res => {
+          const resData = res.data
+          if (resData.code === 'S') {
+            // 固定写法  为了符合 tinymce的 上传成功回调显示
+            success(resData.ossUrl)
+            // 这里用于实现  把上传后的 url 直接以img形式拼接到富文本内容中的光标处
+            // window.tinymce
+            //   .get(_this.tinymceId)
+            //   .insertContent(`<imgsrc="${resData.ossUrl}" >`);
+          }
+        })
+        .catch(err => {
+          failure('出现未知问题')
+          console.log(err)
+        })
     }
   }
 }
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .create-article {
   section {
     margin: 15px 0;
@@ -128,7 +184,7 @@ export default {
       margin: 8px 0;
     }
   }
-  .tox-tinymce {
+  ::v-deep .tox-tinymce {
     height: 65vh;
     box-shadow: none !important;
     border: 1px solid #eee !important;
@@ -145,7 +201,7 @@ export default {
     margin: 10px -7px 6px;
     .upload-demo {
       width: 50%;
-      max-width: 360px;
+      max-width: 400px;
       margin: 0 7px;
       ::v-deep .el-upload {
         width: 100%;
