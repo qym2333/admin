@@ -54,13 +54,15 @@ export default {
       activeEditor: null,
       setting: {
         menubar: false,
-        toolbar: 'undo redo | wordcount | fullscreen | formatselect alignleft aligncenter alignright alignjustify | link unlink | numlist bullist | image media table | fontselect fontsizeselect forecolor backcolor | bold italic underline strikethrough | indent outdent | superscript subscript | removeformat |',
+        toolbar: 'undo redo | wordcount | fullscreen | formatselect alignleft aligncenter alignright alignjustify | link unlink | numlist bullist | image table | fontselect fontsizeselect forecolor backcolor | bold italic underline strikethrough | indent outdent | superscript subscript | removeformat |',
         toolbar_drawer: 'sliding',
         quickbars_selection_toolbar: 'removeformat | bold italic underline strikethrough | fontsizeselect forecolor backcolor',
-        plugins: 'link image media table lists fullscreen quickbars wordcount',
+        plugins: 'link image table lists fullscreen quickbars wordcount',
         language: 'zh_CN', // 本地化设置
         height: 350,
-        branding: false
+        branding: false,
+        images_upload_url: '/demo',
+        images_upload_base_path: '/demo'
       },
       // 文章内容
       info: {

@@ -16,7 +16,7 @@
           <li><span class="el-icon-lollipop"></span>你心中的未来是怎样的？</li>
           <li><span class="el-icon-lollipop"></span>最想做的一件事是什么？</li>
           <li><span class="el-icon-lollipop"></span>你现在的生活，开心吗？</li>
-          <li><span class="el-icon-hot-water"></span>心如止水，淡中得味，加油。</li>
+          <li><span class="el-icon-hot-water"></span>要活成一个朝气蓬勃、勇敢热烈的人啊。</li>
         </ul>
       </div>
     </section>

@@ -34,15 +34,15 @@
           <el-form ref="createFormRef" :model="loginForm" label-width="0" :rules="rules">
             <!-- 用户名 -->
             <el-form-item class="user" prop="username">
-              <el-input placeholder="Name" v-model="loginForm.username" clearable></el-input>
+              <el-input placeholder="Name" v-model="loginForm.username"></el-input>
             </el-form-item>
             <!-- 密码 -->
             <el-form-item class="pwd" prop="password">
-              <el-input placeholder="Password" v-model="loginForm.password" show-password clearable></el-input>
+              <el-input placeholder="Password" v-model="loginForm.password" show-password></el-input>
             </el-form-item>
             <!-- 确认密码 -->
             <el-form-item class="pwd" prop="password">
-              <el-input placeholder="Password" v-model="loginForm.password" show-password clearable></el-input>
+              <el-input placeholder="Password" v-model="loginForm.password" show-password></el-input>
             </el-form-item>
             <!-- 按钮 -->
             <el-form-item class="btn">
