@@ -1,14 +1,16 @@
+/**
+ * outputDir: 指定打包目录
+ * publicPath: 判断环境 切换访问域名
+ */
+
 module.exports = {
   devServer: {
     open: true,
     proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:3000/', // 对应自己的接口
-        changeOrigin: true, // 是否允许跨越
+      '/uploads': {
+        target: 'http://server:3000',
         ws: true,
-        pathRewrite: {
-          '^/api': ''
-        }
+        changeOrigin: true
       }
     }
   }

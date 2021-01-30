@@ -5,8 +5,7 @@
       <el-input placeholder="标题" v-model="info.title" clearable>
       </el-input>
     </section>
-
-    <vue-tinymce v-model="info.contentHtml" :setting="setting" ref="md" />
+    <mavon-editor v-model="info.content" :boxShadow="false" :subfield="false" @change="change" ref="md" @imgAdd="$imgAdd" @imgDel="$imgDel" />
     <section>
       <!-- <date @getDate="getDate" :originalDate="data.time" v-if="isReset"></date> -->
       <el-input placeholder="文章摘要" prefix-icon="el-icon-document" clearable v-model="info.describe">
@@ -52,20 +51,6 @@ export default {
     return {
       id: null,
       activeEditor: null,
-      // md配置
-      setting: {
-        menubar: false,
-        toolbar: 'undo redo | wordcount | fullscreen | formatselect alignleft aligncenter alignright alignjustify | link unlink | numlist bullist | image table | fontselect fontsizeselect forecolor backcolor | bold italic underline strikethrough | indent outdent | superscript subscript | removeformat |',
-        toolbar_drawer: 'sliding',
-        quickbars_selection_toolbar: 'removeformat | bold italic underline strikethrough | fontsizeselect forecolor backcolor',
-        plugins: 'link image table lists fullscreen quickbars wordcount',
-        language: 'zh_CN', // 本地化设置
-        height: 350,
-        branding: false,
-        images_upload_handler: this.images_upload_handler
-        // images_upload_url: 'http://127.0.0.1:3000/admin/api/upload'
-        // images_upload_base_path: '/demo'
-      },
       // 文章内容
       info: {
         title: '', // 标题
@@ -104,7 +89,6 @@ export default {
     if (this.id) this.renderData(this.id)
   },
   mounted () {
-    this.activeEditor = this.$tinymce.activeEditor // 当前富文本编辑器
   },
   methods: {
     musicUpload (file) {
@@ -113,14 +97,28 @@ export default {
     imgUpload (file) {
       this.uploads('image', file)
     },
-    // 获取富文本编辑器内容
-    getBody () {
-      const editBody = this.activeEditor.getBody()
-      this.activeEditor.selection.select(editBody)
-      let text = this.activeEditor.selection.getContent({ format: 'text' }).replace(/\n/g, ' ')// 获取纯文本
-      text = text.replace(/[\\s]+/g, ' ')
-      this.info.content = text // 文章纯文本内容
-      this.info.words = text.length // 统计字数（包含空格）
+    async $imgAdd (pos, $file) {
+      // 将图片上传到服务器.
+      var formdata = new FormData()
+      formdata.append('file', $file)
+      const { data: res } = await this.$axios({
+        url: '/upload',
+        method: 'post',
+        data: formdata,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      if (res.status !== 0) return console.log(res.message)
+      this.$refs.md.$img2Url(pos, 'http://localhost:3000' + res.data.url)
+    },
+    async $imgDel (pos) {
+      const url = pos[0].replace('http://localhost:3000', '')
+      const { data: res } = await this.$axios.post('/upload/del', { url })
+      if (res.status !== 0) return this.$message.error(res.msg)
+    },
+    change (value, render) {
+      this.info.contentHtml = render // 解析的html
+      this.info.content = value // 输入的内容
+      this.info.words = value.length // 字数
     },
     async renderData (id) {
       const { data: res } = await this.$axios.get(`article/${id}`)
@@ -128,46 +126,20 @@ export default {
     },
     // 发布文章
     async handleSubmit () {
-      this.getBody()
-      let promise = null
       if (this.id) {
-        promise = await this.$axios.put(`article/${this.id}`, this.info)
+        const { data: res } = await this.$axios.put(`article/${this.id}`, this.info)
+        if (res.status !== 0) return this.$message.error(res.message)
+        this.$message.success(res.message)
+        this.$router.push('/article')
       } else {
         // 摘要默认内容，摘要为空时使用文本
         const describe = this.info.describe
         this.info.describe = !describe ? this.info.content.slice(0, 60) + '...' : describe
-        promise = await this.$axios.post('article', this.info)
+        const { data: res } = await this.$axios.post('article', this.info)
+        if (res.status !== 0) return this.$message.error(res.message)
+        this.$message.success(res.message)
+        this.$router.push('/article')
       }
-      const { data: res } = promise
-      if (res.status !== 0) return this.$message.error(res.message)
-      this.$message.success(res.message)
-      this.$router.push('/article')
-    },
-    images_upload_handler (blobInfo, success, failure, progress) {
-      // tinymce api文档查阅可知   直接获取blob原始数据
-      var blob = blobInfo.blob()
-      // 原生上传
-      var fd = new FormData()
-      fd.append('file', blob)
-      // console.log(_this.uploadUrl, fd);
-      // 上传到 通用上传接口   oss里
-      this.$axios
-        .post('/upload', fd)
-        .then(res => {
-          const resData = res.data
-          if (resData.code === 'S') {
-            // 固定写法  为了符合 tinymce的 上传成功回调显示
-            success(resData.ossUrl)
-            // 这里用于实现  把上传后的 url 直接以img形式拼接到富文本内容中的光标处
-            // window.tinymce
-            //   .get(_this.tinymceId)
-            //   .insertContent(`<imgsrc="${resData.ossUrl}" >`);
-          }
-        })
-        .catch(err => {
-          failure('出现未知问题')
-          console.log(err)
-        })
     }
   }
 }
@@ -183,6 +155,10 @@ export default {
       height: 38px;
       margin: 8px 0;
     }
+  }
+  .markdown-body {
+    height: 65vh;
+    border: 1px solid #eee !important;
   }
   ::v-deep .tox-tinymce {
     height: 65vh;
