@@ -24,14 +24,16 @@
         </el-upload>
         <el-upload class="upload-demo" :auto-upload="false" :show-file-list="false" :on-change="imgUpload" action="" drag>
           <img v-if="info.image && info.image.url" :src="info.image.url">
-          <i class="el-icon-picture-outline-round"></i>
-          <div class="el-upload__text">封面图片 (680*440)</div>
+          <div v-else>
+            <i class="el-icon-picture-outline-round"></i>
+            <div class="el-upload__text">封面图片 (680*440)</div>
+          </div>
         </el-upload>
       </div>
       <template v-else>
-        <el-input placeholder="音乐地址" prefix-icon="el-icon-headset" clearable>
+        <el-input placeholder="音乐地址" prefix-icon="el-icon-headset" v-model="info.music.url" clearable>
         </el-input>
-        <el-input placeholder="封面图片" prefix-icon="el-icon-picture-outline-round" clearable>
+        <el-input placeholder="封面图片" prefix-icon="el-icon-picture-outline-round" v-model="info.image.url" clearable>
         </el-input>
       </template>
 
@@ -49,8 +51,8 @@
 export default {
   data () {
     return {
-      id: null,
-      activeEditor: null,
+      id: null, // 当前文章id （编辑）
+      isReset: true,
       // 文章内容
       info: {
         title: '', // 标题
@@ -86,7 +88,9 @@ export default {
   },
   created () {
     this.id = this.$route.query.id
-    if (this.id) this.renderData(this.id)
+    if (this.id) {
+      this.renderData(this.id)
+    }
   },
   mounted () {
   },
@@ -96,6 +100,29 @@ export default {
     },
     imgUpload (file) {
       this.uploads('image', file)
+    },
+    // 保存临时文件
+    uploads (type, file) {
+      const name = type === 'music' ? 'audio' : 'image'
+      if (!file.raw.type.includes(name)) {
+        this.$message.error(`请选择${name}格式的文件!`)
+        return
+      }
+      const formData = new FormData()
+      formData.append('file', file.raw)
+      formData.append('type', this.$data.info.upload_type)
+
+      console.log(file.raw)
+      this.$set(this.info, type, {
+        url: URL.createObjectURL(file.raw),
+        name: file.name
+      })
+
+      this.$set(this.upload, type, {
+        url: URL.createObjectURL(file.raw),
+        name: file.name,
+        formData
+      })
     },
     async $imgAdd (pos, $file) {
       // 将图片上传到服务器.
@@ -122,10 +149,39 @@ export default {
     },
     async renderData (id) {
       const { data: res } = await this.$axios.get(`article/${id}`)
-      this.info = res.data[0]
+      setTimeout(() => {
+        this.info = res.data[0]
+        this.isReset = false
+        this.$nextTick(() => { this.isReset = true })
+      }, 500)
     },
     // 发布文章
     async handleSubmit () {
+      const map = {
+        title: '请输入标题',
+        content: '请输入内容'
+        // time: '请选择时间'
+      }
+      for (const i in map) {
+        if (!this.info[i]) {
+          this.$message.error(`${map[i]}`)
+          return
+        }
+      }
+      // 上传文件
+      if (!this.uploadToggle) {
+        for (const i in this.upload) {
+          const { data: res } = await this.$axios.post('/upload', this.upload[i].formData)
+          if (res.status === 0) {
+            console.log(this.info[i])
+            this.info[i].url = res.data.url
+          } else {
+            // 错误
+            this.$message.error(res.message)
+          }
+        }
+      }
+
       if (this.id) {
         const { data: res } = await this.$axios.put(`article/${this.id}`, this.info)
         if (res.status !== 0) return this.$message.error(res.message)
@@ -157,7 +213,7 @@ export default {
     }
   }
   .markdown-body {
-    height: 65vh;
+    // height: 65vh;
     border: 1px solid #eee !important;
   }
   ::v-deep .tox-tinymce {

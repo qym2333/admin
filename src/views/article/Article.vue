@@ -13,13 +13,13 @@
       </el-table-column>
       <el-table-column label="options" width=100>
         <template slot-scope="scope">
-          <el-tooltip class="item" effect="dark" content="View Article" placement="top">
-            <i class="el-icon-view" @click="view(scope.row.id)"></i>
+          <el-tooltip class="item" effect="dark" content="View Article" placement="top" :enterable="false">
+            <i class="el-icon-view" @click="$router.push(`/article/detail/${scope.row.id}`) "></i>
           </el-tooltip>
-          <el-tooltip effect="dark" content="Edit Article" placement="top">
+          <el-tooltip effect="dark" content="Edit Article" placement="top" :enterable="false">
             <i class="el-icon-edit" @click="handleEdit(scope.row.id)"></i>
           </el-tooltip>
-          <el-tooltip effect="dark" content="Delete" placement="top">
+          <el-tooltip effect="dark" content="Delete" placement="top" :enterable="false">
             <i class="el-icon-delete" @click="handleDelete(scope.row.id)"></i>
           </el-tooltip>
         </template>
@@ -49,10 +49,14 @@ export default {
     this.getArticleList()
   },
   mounted () {
-    document.querySelector('.content').style.overflow = 'hidden'
+    if (document.querySelector('.content')) {
+      document.querySelector('.content').style.overflow = 'hidden'
+    }
   },
   destroyed () {
-    document.querySelector('.content').style.overflow = 'auto'
+    if (document.querySelector('.content')) {
+      document.querySelector('.content').style.overflow = 'auto'
+    }
   },
   methods: {
     // 获取文章列表
