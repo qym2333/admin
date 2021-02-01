@@ -6,6 +6,7 @@ import Welcome from '../views/Welcome.vue'
 import Article from '../views/article/Article.vue'
 import ArticleInfo from '../views/article/Info.vue'
 import ArticleDetail from '../views/article/Detail.vue'
+import Envelope from '../views/envelope/Envelope.vue'
 
 Vue.use(VueRouter)
 
@@ -33,6 +34,9 @@ const routes = [{
     name: 'articleInfo',
     path: '/article/info',
     component: ArticleInfo
+  }, {
+    path: '/envelope',
+    component: Envelope
   }]
 }]
 
