@@ -1,28 +1,15 @@
-<template id="detail">
-  <div class="articleld">
+<template>
+  <div class="articleId">
 
-    <!-- Article Progress -->
-    <div class="scrollbar" :style="{width: postProgress}"></div>
-
-    <!-- <Header :music="data.music.url" :title="data.title" :like="data._id" @liked="liked"></Header> -->
-
+    <!-- Content -->
     <section>
-      <h1 class="title">{{data.title}}</h1>
-      <!-- <div class="stuff">
-        <span>{{data.time.month.cn}}月 {{data.time.day.on}}, {{data.time.year}}</span>
-        <span>阅读 {{data.read}}</span>
-        <span>字数 {{data.words}}</span>
-        <span>评论 {{commentTotal}}</span>
-        <span>喜欢 {{data.like}}</span>
-      </div> -->
-
+      <h1 class="title">{{articleInfo.title}}</h1>
       <div class="content">
-        <mavon-editor codeStyle="monokai-sublime" v-html="data.contentHtml" />
+        <mavon-editor v-html="articleInfo.contentHtml">
+        </mavon-editor>
       </div>
     </section>
 
-    <!-- Comment -->
-    <!-- <Comment :id="data.id" :title="data.title" @total="totalComment"></Comment> -->
   </div>
 </template>
 
@@ -30,70 +17,32 @@
 export default {
   data () {
     return {
-      data: {},
-      title: false,
-      isLike: false,
-
-      timer: null,
-      postProgress: 0,
-
-      scrollTop: 0,
-      timerTop: null,
-      scrollTopBtn: false,
-      loading: true,
-
-      commentTotal: 0,
-
-      header: true
+      articleInfo: {}
     }
   },
+
   created () {
     this.getArticle()
   },
-  methods: {
-    async getArticle () {
-      const id = this.$route.params.id
-      const { data: res } = await this.$axios.get(`/article/${id}`)
-      this.data = res.data[0]
-    },
-    handleScroll () {
-      /**
-       * Article Progress
-       */
-      this.scrollTop = document.documentElement.scrollTop || document.body.scrollTop
-
-      const h1 = document.getElementsByClassName('content')[0]
-      const h2 = document.getElementsByClassName('stuff')[0]
-      const h3 = document.getElementsByTagName('h1')[0]
-
-      const h = h1.offsetHeight + h2.offsetHeight + h3.offsetHeight - document.documentElement.clientHeight - 100
-      const n = (100 * (this.scrollTop / h)).toFixed(4)
-
-      if (n < 110) this.postProgress = n + '%'
-    }
-    // error page
+  mounted () {
+    document.body.style.overflow = 'auto'
   },
   destroyed () {
-    window.removeEventListener('scroll', this.handleScroll, true)
+    document.body.style.overflow = 'hidden'
   },
-  mounted () {
-    window.addEventListener('scroll', this.handleScroll, true)
+  methods: {
+    async getArticle () {
+      const articleId = this.$route.params.id
+      const { data: res } = await this.$axios.get(`article/${articleId}`)
+      if (res.status !== 0) return this.$message.error('网络错误或网页资源不存在')
+      this.articleInfo = res.data[0]
+    }
   }
-  // async asyncData (context) {
-  //   const id = context.params.articleId;
-  //   const { data } = await context.$axios.get(`article/${id}`)
-
-  //   if (data.status == 1) {
-  //     return { data: data.body }
-  //   } else {
-  //     context.error({ statusCode: 404, message: '页面未找到或无数据' })
-  //   }
-  // },
 }
 </script>
 
-<style lang="less" scoped>
-.articleld {
+<style scoped lang='less'>
+.articleId {
   position: absolute;
   width: 100%;
   section {
@@ -101,39 +50,10 @@ export default {
     margin: auto;
     transition: all 0.3s;
   }
-  .scrollbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: #50bcb6;
-    transition: width 0.5s ease;
-    z-index: 999999;
-  }
   h1.title {
     font-size: 30px;
     padding: 130px 0 22px;
     color: #333;
-  }
-  .stuff {
-    color: #6a737d;
-    position: relative;
-    line-height: 22px;
-    span {
-      font-size: 13px;
-      margin-right: 10px;
-      display: inline-block;
-    }
-    &:after {
-      content: '';
-      width: 100px;
-      position: absolute;
-      bottom: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-bottom: 1px solid #eaeaea;
-    }
   }
   .content {
     padding: 100px 0;
@@ -232,20 +152,7 @@ export default {
       }
     }
   }
-  .back-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    height: 20px;
-    line-height: 20px;
-    background: #50bcb6;
-    font-size: 13px;
-    z-index: 9999;
-    padding: 0 5px;
-    color: #fff;
-  }
 }
-
 @media screen and (max-width: 800px) {
   .articleld {
     section {
@@ -319,20 +226,6 @@ export default {
         height: 220px;
       }
     }
-  }
-}
-
-.verify {
-  filter: blur(5px);
-}
-@keyframes headShow {
-  from {
-    opacity: 0;
-    top: -50px;
-  }
-  to {
-    top: 0;
-    opacity: 1;
   }
 }
 </style>
