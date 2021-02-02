@@ -2,15 +2,12 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
+import './plugins/mavon-editor'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/global.css'
 import axios from 'axios'
 import moment from 'moment'
-import mavonEditor from 'mavon-editor'
-import 'mavon-editor/dist/css/index.css'
 
-// use
-Vue.use(mavonEditor)
 // 引入axios
 Vue.prototype.$axios = axios
 // 引入moment
