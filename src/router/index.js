@@ -7,7 +7,8 @@ import Article from '../views/article/Article.vue'
 import ArticleInfo from '../views/article/Info.vue'
 import ArticleDetail from '../views/article/Detail.vue'
 import Envelope from '../views/envelope/Envelope.vue'
-
+import Myself from '../views/myself/Myself.vue'
+import MyselfInfo from '../views/myself/Info.vue'
 Vue.use(VueRouter)
 
 const routes = [{
@@ -37,6 +38,12 @@ const routes = [{
   }, {
     path: '/envelope',
     component: Envelope
+  }, {
+    path: '/myself',
+    component: Myself
+  }, {
+    path: '/myself/info',
+    component: MyselfInfo
   }]
 }]
 
