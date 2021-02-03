@@ -7,7 +7,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import './assets/global.css'
 import axios from 'axios'
 import moment from 'moment'
-
+import store from './store/index'
 // 引入axios
 Vue.prototype.$axios = axios
 // 引入moment
@@ -25,5 +25,6 @@ Vue.config.productionTip = false
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

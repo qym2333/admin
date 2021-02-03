@@ -20,9 +20,33 @@
         </ul>
       </div>
     </section>
+    <section>
+      <h3>article</h3>
+      <div class="box" v-if="articleInfo">
+        <p>
+          <span class="total">{{articleInfo.count}}</span>
+          <span>篇</span>
+        </p>
+        <p>{{timeFromNow(articleInfo.lastestTime)}} 发布了新的网抑云，继续加油哦！</p>
+      </div>
+      <div class="box" v-else>
+        <p>
+          <span class="total">0</span>
+          <span>篇</span>
+        </p>
+        <p>网抑云时间到啦！</p>
+      </div>
+    </section>
     <section></section>
-    <section></section>
-    <section></section>
+    <section>
+      <h3 class="link" @click="$router.push('/envelope')">envelope</h3>
+      <div class="envelope" v-if="envelopeList && envelopeList.length > 0">
+        <p v-for="(item, index) in envelopeList" :key="index"><span>{{index + 1}}</span>{{item.content}}</p>
+      </div>
+      <div class="envelope" v-else style="display: flex;text-align: center;align-items: center;height: 80%;">
+        <p>空空如也</p>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -37,9 +61,12 @@ export default {
   },
 
   created () {
-    this.oneRemark()
+
   },
   mounted () {
+    this.$store.dispatch('getEnvelopeList')
+    this.$store.dispatch('getArticleInfo')
+    this.oneRemark()
     this.timer = setInterval(this.date, 1000)
     document.querySelector('.container').style.background = '#f9fcff'
   },
@@ -48,6 +75,14 @@ export default {
     clearInterval(this.timer)
     if (document.querySelector('.container')) {
       document.querySelector('.container').style.background = '#fff'
+    }
+  },
+  computed: {
+    envelopeList () {
+      return this.$store.state.envelopeList.data
+    },
+    articleInfo () {
+      return this.$store.state.articleCountInfo
     }
   },
   methods: {
@@ -73,6 +108,18 @@ export default {
         year: '还剩下',
         date: `${day}天${hour}时${minute}分${second}秒`
       }
+    },
+    timeFromNow (time) {
+      const format = 'YYYY-MM-DD HH:mm:ss'
+      const formatTime = 'HH:mm:ss'
+      let timeStr = this.$moment(time).format(format)
+      const fromNowStr = this.$moment(time).fromNow(true)
+      if (fromNowStr.indexOf('小时') > 0 && parseInt(fromNowStr) > 5) {
+        timeStr = '今天 ' + this.$moment(time).format(formatTime)
+      } else {
+        timeStr = fromNowStr + '前'
+      }
+      return timeStr
     }
   }
 }
@@ -141,6 +188,9 @@ export default {
       position: relative;
       height: 20px;
       margin-bottom: 20px;
+      &.link {
+        cursor: pointer;
+      }
       &::before {
         content: '';
         height: 1px;
