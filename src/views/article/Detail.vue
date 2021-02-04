@@ -1,6 +1,5 @@
 <template>
   <div class="articleId">
-
     <!-- Content -->
     <section>
       <h1 class="title">{{articleInfo.title}}</h1>
@@ -9,7 +8,6 @@
         </mavon-editor>
       </div>
     </section>
-
   </div>
 </template>
 
