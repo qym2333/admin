@@ -21,7 +21,8 @@ export default {
     Sidebar
   },
   created () {
-
+    // 加载所需数据
+    this.$infoUpdate()
   },
 
   methods: {

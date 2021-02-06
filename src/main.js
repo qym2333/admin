@@ -13,7 +13,7 @@ Vue.prototype.$axios = axios
 // 引入moment
 moment.locale('zh-cn') // 设置语言 或 moment.lang('zh-cn');
 Vue.prototype.$moment = moment // 赋值使用
-
+Vue.config.productionTip = false
 // axios配置
 axios.defaults.baseURL = 'http://127.0.0.1:3000/admin/api/'
 axios.interceptors.request.use(config => {
@@ -21,7 +21,14 @@ axios.interceptors.request.use(config => {
   return config
 })
 
-Vue.config.productionTip = false
+// 获取个人信息
+Vue.prototype.$infoUpdate = async () => {
+  const { data: res } = await axios.get('/info')
+  if (res && res.status === 0) {
+    const data = res.data
+    store.commit('info', data)
+  }
+}
 
 new Vue({
   router,

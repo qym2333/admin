@@ -21,13 +21,13 @@
       </div>
     </section>
     <section>
-      <h3>article</h3>
-      <div class="box" v-if="articleInfo">
+      <h3 class="link" @click="$router.push('/article')">article</h3>
+      <div class="box" v-if="$data.article">
         <p>
-          <span class="total">{{articleInfo.count}}</span>
+          <span class="total">{{$data.articleCnt}}</span>
           <span>篇</span>
         </p>
-        <p>{{timeFromNow(articleInfo.lastestTime)}} 发布了新的网抑云，继续加油哦！</p>
+        <p>{{timeFromNow($data.article.createTime)}} 发布了新的网抑云，继续加油哦！</p>
       </div>
       <div class="box" v-else>
         <p>
@@ -37,11 +37,27 @@
         <p>网抑云时间到啦！</p>
       </div>
     </section>
-    <section></section>
+    <section>
+      <h3 class="link" @click="$router.push('/comment')">comment</h3>
+      <div class="box" v-if="$data.commentCnt">
+        <p>
+          <span class="total">{{$data.commentCnt}}</span>
+          <span>条</span>
+        </p>
+        <p>过去的时间里，收获了些许陌生的美好。</p>
+      </div>
+      <div class="box" v-else>
+        <p>
+          <span class="total">0</span>
+          <span>条</span>
+        </p>
+        <p>过去的时间里，收获了些许陌生的美好。</p>
+      </div>
+    </section>
     <section>
       <h3 class="link" @click="$router.push('/envelope')">envelope</h3>
-      <div class="envelope" v-if="envelopeList && envelopeList.length > 0">
-        <p v-for="(item, index) in envelopeList" :key="index"><span>{{index + 1}}</span>{{item.content}}</p>
+      <div class="envelope" v-if="$envelope && $envelope.length > 0">
+        <p v-for="(item, index) in $envelope" :key="index"><span>{{index + 1}}</span>{{item.content}}</p>
       </div>
       <div class="envelope" v-else style="display: flex;text-align: center;align-items: center;height: 80%;">
         <p>空空如也</p>
@@ -51,6 +67,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -64,8 +81,6 @@ export default {
 
   },
   mounted () {
-    this.$store.dispatch('getEnvelopeList')
-    this.$store.dispatch('getArticleInfo')
     this.oneRemark()
     this.timer = setInterval(this.date, 1000)
     document.querySelector('.container').style.background = '#f9fcff'
@@ -78,11 +93,9 @@ export default {
     }
   },
   computed: {
-    envelopeList () {
-      return this.$store.state.envelopeList.data
-    },
-    articleInfo () {
-      return this.$store.state.articleCountInfo
+    ...mapState(['$data']),
+    $envelope () {
+      return this.$data ? this.$data.envelope : ''
     }
   },
   methods: {

@@ -1,39 +1,41 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    envelopeList: [], // 信封列表
-    articleCountInfo: {
-      count: 0,
-      lastestTime: ''
-    }
+    comment: {},
+    article: {},
+    $data: {},
+    menu: ''
   },
   mutations: {
-    // 更新信封列表
-    upEnvelopeList (state, payload) {
-      state.envelopeList = payload
+    // 缓存评论或文章
+    setCache (state, payload) {
+      state.$data[`${payload.type}Cnt`] = payload.total
+      state[payload.type][payload.page] = payload.data
     },
-    // 更新文章信息
-    upArticleInfo (state, payload) {
-      state.articleCountInfo = payload
-    }
-  },
-  actions: {
-    async getEnvelopeList (context) {
-      const { data: res } = await axios.get('envelope')
-      context.commit('upEnvelopeList', res.data)
+    // 清除评论或文章
+    resetCache (state, type) {
+      state[type] = {}
     },
-    async getArticleInfo (context) {
-      const { data: res } = await axios.get('article')
-      const info = {
-        count: res.data.total,
-        lastestTime: res.data.data[0].createTime
-      }
-      context.commit('upArticleInfo', info)
+    // 信息
+    info (state, data) {
+      state.$data = data
+    },
+    // 已读
+    updateUnread (state) {
+      state.$data.unread = 0
+      state.comment = {}
+    },
+    // 更新信息
+    updataInfo (state, data) {
+      state.$data.info = data
+    },
+    // 动态导航
+    setMenu (state, data) {
+      state.menu = data
     }
   }
 })
