@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import axios from 'axios'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -39,8 +39,12 @@ const store = new Vuex.Store({
     }
   },
   actions: {
-    getInfo (context, data) {
-      context.commit('info', data)
+    async getInfo (context) {
+      const { data: res } = await axios.get('/info')
+      if (res && res.status === 0) {
+        const data = res.data
+        context.commit('info', data)
+      }
     }
   }
 })
