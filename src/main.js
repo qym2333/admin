@@ -26,7 +26,8 @@ Vue.prototype.$infoUpdate = async () => {
   const { data: res } = await axios.get('/info')
   if (res && res.status === 0) {
     const data = res.data
-    store.commit('info', data)
+    store.dispatch('getInfo', data)
+    // store.commit('info', data)
   }
 }
 

@@ -37,6 +37,11 @@ const store = new Vuex.Store({
     setMenu (state, data) {
       state.menu = data
     }
+  },
+  actions: {
+    getInfo (context, data) {
+      context.commit('info', data)
+    }
   }
 })
 
