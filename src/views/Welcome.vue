@@ -78,7 +78,7 @@ export default {
   },
 
   created () {
-    this.$store.dispatch('getInfo')
+
   },
   mounted () {
     this.oneRemark()

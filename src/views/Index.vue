@@ -22,7 +22,7 @@ export default {
   },
   created () {
     // 加载所需数据
-    this.$infoUpdate()
+    this.$store.dispatch('getInfo')
   },
 
   methods: {

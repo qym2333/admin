@@ -34,7 +34,7 @@
         </el-input>
         <div class="bottom-btn">
           <el-button type="primary" @click="handleSubmit">Send</el-button>
-          <el-button type="info" @click="closeDialog">Cencel</el-button>
+          <el-button type="info" @click="closeDialog">Cancel</el-button>
         </div>
         <!-- <i class="el-icon-circle-close" @click="isShow=false"></i> -->
       </div>

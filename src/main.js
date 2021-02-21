@@ -21,15 +21,6 @@ axios.interceptors.request.use(config => {
   return config
 })
 
-// // 获取个人信息
-// Vue.prototype.$infoUpdate = async () => {
-//   const { data: res } = await axios.get('/info')
-//   if (res && res.status === 0) {
-//     const data = res.data
-//     store.dispatch('getInfo', data)
-//   }
-// }
-
 new Vue({
   router,
   store,

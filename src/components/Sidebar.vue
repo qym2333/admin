@@ -7,7 +7,7 @@
         </div>
         <p class="name">胖达</p>
       </div>
-      <el-menu :default-active="activeIndex" mode="horizontal" router :collapse="isCollapse" :collapse-transition="false">
+      <el-menu :default-active="$route.path" mode="horizontal" router :collapse="isCollapse" :collapse-transition="false">
         <el-menu-item :index="item.path" v-for="(item,index) in menuList" :key="index" @click="toPage(item.title)">
           <i :class="item.icon"></i>
           <span>{{item.title}}</span>
@@ -70,13 +70,8 @@ export default {
         }
       ],
       isCollapse: false,
-      isShow: false,
-      activeIndex: '1'
+      isShow: false
     }
-  },
-
-  created () {
-    this.activeIndex = this.$route.path
   },
 
   methods: {
